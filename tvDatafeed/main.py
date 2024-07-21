@@ -92,6 +92,7 @@ class TvDatafeed:
                         # Token aus einer Datei lesen
                         with open('token.txt', 'r') as f:
                             token = f.read()
+                            print(token)
                     else:
                         with requests.Session() as s:
                             response = s.post(url=self.__sign_in_url, data=data, headers=self.__signin_headers)
