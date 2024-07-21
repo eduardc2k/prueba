@@ -1,3 +1,4 @@
+
 import datetime
 import enum
 import json
@@ -66,9 +67,8 @@ class TvDatafeed:
         if self.token is None:
             self.token = "unauthorized_user_token"
             logger.warning(
-                "you are using nologin method, data you access may be limited AAAAAAAAA"
+                "you are using nologin method, data you access may be limited"
             )
-            Print('Prueba')
 
         self.ws = None
         self.session = self.__generate_session()
@@ -78,8 +78,7 @@ class TvDatafeed:
         
         try:
             with open(tokendata, 'r') as f:
-                token = "eyJhbGciOiJSUzUxMiIsImtpZCI6IkdaeFUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjozNzQ5MjY3LCJleHAiOjE3MjE1NDIyODksImlhdCI6MTcyMTUyNzg4OSwicGxhbiI6InByb19wcmVtaXVtIiwiZXh0X2hvdXJzIjoxLCJwZXJtIjoibnlzZSxuYXNkYXEsYW1leCxvdGMiLCJzdHVkeV9wZXJtIjoidHYtY2hhcnRfcGF0dGVybnMsdHYtcHJvc3R1ZGllcyx0di12b2x1bWVieXByaWNlLHR2LWNoYXJ0cGF0dGVybnMiLCJtYXhfc3R1ZGllcyI6MjUsIm1heF9mdW5kYW1lbnRhbHMiOjEwLCJtYXhfY2hhcnRzIjo4LCJtYXhfYWN0aXZlX2FsZXJ0cyI6NDAwLCJtYXhfc3R1ZHlfb25fc3R1ZHkiOjI0LCJmaWVsZHNfcGVybWlzc2lvbnMiOlsicmVmYm9uZHMiXSwibWF4X292ZXJhbGxfYWxlcnRzIjoyMDAwLCJtYXhfYWN0aXZlX3ByaW1pdGl2ZV9hbGVydHMiOjQwMCwibWF4X2FjdGl2ZV9jb21wbGV4X2FsZXJ0cyI6NDAwLCJtYXhfY29ubmVjdGlvbnMiOjUwfQ.Ajt5414dh871B7o_ZJ6YATBMpUzClWXx-pOxym_xF_vpQnsfBB2xD98IpyIBZFZio8PIAcH0V3NyG5OjVWOufCz73Sn1Q1DH9nu9k0OVXVlc6AsseSOcMqysXdIEt7kzIpriVCl47gs6LV9jYcSEww8PHUz3PP2cbLfgY_S8isc"
-                //f.read()
+                token = f.read()
         except IOError:
             if (username is None or password is None):
                 token = None
@@ -88,17 +87,12 @@ class TvDatafeed:
                 data = {"username": username,
                         "password": password,
                         "remember": "on"}
-                if os.path.exists('token.txt'):
-                   print("El archivo token.txt existe en el directorio actual")
-                else:
-                   print("El archivo token.txt no existe en el directorio actual")
                 try:
 
                     if os.path.exists('token.txt'):
                         # Token aus einer Datei lesen
                         with open('token.txt', 'r') as f:
-                            token = token = "eyJhbGciOiJSUzUxMiIsImtpZCI6IkdaeFUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjozNzQ5MjY3LCJleHAiOjE3MjE1NDIyODksImlhdCI6MTcyMTUyNzg4OSwicGxhbiI6InByb19wcmVtaXVtIiwiZXh0X2hvdXJzIjoxLCJwZXJtIjoibnlzZSxuYXNkYXEsYW1leCxvdGMiLCJzdHVkeV9wZXJtIjoidHYtY2hhcnRfcGF0dGVybnMsdHYtcHJvc3R1ZGllcyx0di12b2x1bWVieXByaWNlLHR2LWNoYXJ0cGF0dGVybnMiLCJtYXhfc3R1ZGllcyI6MjUsIm1heF9mdW5kYW1lbnRhbHMiOjEwLCJtYXhfY2hhcnRzIjo4LCJtYXhfYWN0aXZlX2FsZXJ0cyI6NDAwLCJtYXhfc3R1ZHlfb25fc3R1ZHkiOjI0LCJmaWVsZHNfcGVybWlzc2lvbnMiOlsicmVmYm9uZHMiXSwibWF4X292ZXJhbGxfYWxlcnRzIjoyMDAwLCJtYXhfYWN0aXZlX3ByaW1pdGl2ZV9hbGVydHMiOjQwMCwibWF4X2FjdGl2ZV9jb21wbGV4X2FsZXJ0cyI6NDAwLCJtYXhfY29ubmVjdGlvbnMiOjUwfQ.Ajt5414dh871B7o_ZJ6YATBMpUzClWXx-pOxym_xF_vpQnsfBB2xD98IpyIBZFZio8PIAcH0V3NyG5OjVWOufCz73Sn1Q1DH9nu9k0OVXVlc6AsseSOcMqysXdIEt7kzIpriVCl47gs6LV9jYcSEww8PHUz3PP2cbLfgY_S8isc"#f.read()
-                            print(token)
+                            token = f.read()
                     else:
                         with requests.Session() as s:
                             response = s.post(url=self.__sign_in_url, data=data, headers=self.__signin_headers)
