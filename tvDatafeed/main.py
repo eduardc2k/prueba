@@ -86,6 +86,10 @@ class TvDatafeed:
                 data = {"username": username,
                         "password": password,
                         "remember": "on"}
+                if os.path.exists('token.txt'):
+                   print("El archivo token.txt existe en el directorio actual")
+                else:
+                   print("El archivo token.txt no existe en el directorio actual")
                 try:
 
                     if os.path.exists('token.txt'):
