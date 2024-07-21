@@ -2,11 +2,12 @@ import datetime
 import enum
 import json
 import logging
+import os
 import random
 import re
 import string
 import pandas as pd
-from websocket import create_connection
+from websocket import create_connection, WebSocketTimeoutException
 import requests
 import json
 from pathlib import Path
@@ -39,13 +40,15 @@ class TvDatafeed:
     __sign_in_totp = 'https://www.tradingview.com/accounts/two-factor/signin/totp/'
     __search_url = 'https://symbol-search.tradingview.com/symbol_search/?text={}&hl=1&exchange={}&lang=en&type=&domain=production'
     __ws_headers = json.dumps({"Origin": "https://data.tradingview.com"})
-    __signin_headers = {'Referer': 'https://www.tradingview.com'}
-    __ws_timeout = 5
+    __ws_proheaders = json.dumps({"Origin": "https://prodata.tradingview.com"})
+    __signin_headers = {'Referer': 'https://www.tradingview.com', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'}
+    __ws_timeout = 10
 
     def __init__(
         self,
         username: str = None,
         password: str = None,
+        pro: bool =False
     ) -> None:
         """Create TvDatafeed object
 
@@ -56,6 +59,8 @@ class TvDatafeed:
 
         self.ws_debug = False
 
+        self.pro = pro
+                
         self.token = self.__auth(username, password)
 
         if self.token is None:
@@ -82,19 +87,28 @@ class TvDatafeed:
                         "password": password,
                         "remember": "on"}
                 try:
-                    with requests.Session() as s:
-                        response = s.post(url=self.__sign_in_url, data=data, headers=self.__signin_headers)
-                        # '{"error":"2FA_required","code":"2FA_required","message":"Second authentication factor is needed","two_factor_types":[{"name":"totp"}]}'
-                        if "2FA_required" in response.text:
-                            response = s.post(url=self.__sign_in_totp, data={"code": self.__getcode()}, headers=self.__signin_headers)
-                            token = response.json()['user']['auth_token']
-                            with open(tokendata, 'w') as f:
-                                    f.write(token)
-                        else:
-                            token = response.json()['user']['auth_token']
+
+                    if os.path.exists('token.txt'):
+                        # Token aus einer Datei lesen
+                        with open('token.txt', 'r') as f:
+                            token = f.read()
+                    else:
+                        with requests.Session() as s:
+                            response = s.post(url=self.__sign_in_url, data=data, headers=self.__signin_headers)
+                            # '{"error":"2FA_required","code":"2FA_required","message":"Second authentication factor is needed","two_factor_types":[{"name":"totp"}]}'
+                            if "2FA_required" in response.text:
+                                response = s.post(url=self.__sign_in_totp, data={"code": self.__getcode()}, headers=self.__signin_headers)
+                                token = response.json()['user']['auth_token']
+                                with open(tokendata, 'w') as f:
+                                        f.write(token)
+                            else:
+                                token = response.json()['user']['auth_token']
+
+                            with open('token.txt', 'w') as f:
+                                f.write(token)
 
                 except Exception as e:
-                    logger.error('error while signin')
+                    logger.error(f'Error during login - server response {response.json()}')
                     token = None
 
         return token
@@ -107,15 +121,16 @@ class TvDatafeed:
     
     @staticmethod
     def __delete_token():
-        self.token = None
         tokendata.unlink()
+        self.token = None
         raise Exception("error with token - exiting")    
     
     def __create_connection(self):
         logging.debug("creating websocket connection")
-        self.ws = create_connection(
-            "wss://data.tradingview.com/socket.io/websocket", headers=self.__ws_headers, timeout=self.__ws_timeout
-        )
+        if self.pro:
+            self.ws = create_connection("wss://prodata.tradingview.com/socket.io/websocket", headers=self.__ws_proheaders, timeout=self.__ws_timeout)
+        else:
+             self.ws = create_connection("wss://data.tradingview.com/socket.io/websocket", headers=self.__ws_headers, timeout=self.__ws_timeout)
 
     @staticmethod
     def __filter_raw_message(text):
@@ -310,6 +325,9 @@ class TvDatafeed:
             try:
                 result = self.ws.recv()
                 raw_data = raw_data + result + "\n"
+            except WebSocketTimeoutException as e:
+                logger.error(e)
+                break
             except Exception as e:
                 self.__delete_token()
                 logger.error(e)
@@ -330,7 +348,6 @@ class TvDatafeed:
             symbols_list = json.loads(resp.text.replace(
                 '</em>', '').replace('<em>', ''))
         except Exception as e:
-            self.__delete_token()
             logger.error(e)
 
         return symbols_list
