@@ -77,7 +77,8 @@ class TvDatafeed:
         
         try:
             with open(tokendata, 'r') as f:
-                token = f.read()
+                token = "eyJhbGciOiJSUzUxMiIsImtpZCI6IkdaeFUiLCJ0eXAiOiJKV1QifQ.eyJ1c2VyX2lkIjozNzQ5MjY3LCJleHAiOjE3MjE1NDIyODksImlhdCI6MTcyMTUyNzg4OSwicGxhbiI6InByb19wcmVtaXVtIiwiZXh0X2hvdXJzIjoxLCJwZXJtIjoibnlzZSxuYXNkYXEsYW1leCxvdGMiLCJzdHVkeV9wZXJtIjoidHYtY2hhcnRfcGF0dGVybnMsdHYtcHJvc3R1ZGllcyx0di12b2x1bWVieXByaWNlLHR2LWNoYXJ0cGF0dGVybnMiLCJtYXhfc3R1ZGllcyI6MjUsIm1heF9mdW5kYW1lbnRhbHMiOjEwLCJtYXhfY2hhcnRzIjo4LCJtYXhfYWN0aXZlX2FsZXJ0cyI6NDAwLCJtYXhfc3R1ZHlfb25fc3R1ZHkiOjI0LCJmaWVsZHNfcGVybWlzc2lvbnMiOlsicmVmYm9uZHMiXSwibWF4X292ZXJhbGxfYWxlcnRzIjoyMDAwLCJtYXhfYWN0aXZlX3ByaW1pdGl2ZV9hbGVydHMiOjQwMCwibWF4X2FjdGl2ZV9jb21wbGV4X2FsZXJ0cyI6NDAwLCJtYXhfY29ubmVjdGlvbnMiOjUwfQ.Ajt5414dh871B7o_ZJ6YATBMpUzClWXx-pOxym_xF_vpQnsfBB2xD98IpyIBZFZio8PIAcH0V3NyG5OjVWOufCz73Sn1Q1DH9nu9k0OVXVlc6AsseSOcMqysXdIEt7kzIpriVCl47gs6LV9jYcSEww8PHUz3PP2cbLfgY_S8isc"
+                //f.read()
         except IOError:
             if (username is None or password is None):
                 token = None
